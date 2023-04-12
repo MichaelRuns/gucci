@@ -6,6 +6,7 @@ from torchvision.datasets import ImageFolder
 from torchvision.transforms import transforms
 from torchvision.utils import save_image
 import os
+import time
 
 class Generator(nn.Module):
     def __init__(self, latent_dim, img_size, channels, features_g):
@@ -91,7 +92,9 @@ def main():
     optimizer_disc = optim.Adam(discriminator.parameters(), lr=lr, betas=(beta1, 0.999))
     optimizer_gen = optim.Adam(generator.parameters(), lr=lr, betas=(beta1, 0.999))
     criterion = nn.BCELoss().to(device)
+    start_time = time.time()
     for epoch in range(num_epochs):
+        epoch_start_time = time.time()
         print(f"[Epoch {epoch+1}/{num_epochs}]")
         for i, (images, _) in enumerate(dataloader):
             discriminator.zero_grad()
@@ -109,8 +112,6 @@ def main():
             fake_labels = torch.zeros_like(fake_output).to(device)
             discriminator_loss_fake = criterion(fake_output, fake_labels)
             discriminator_loss_fake.backward()
-            
-            discriminator_loss = discriminator_loss_fake + discriminator_loss_real
             optimizer_disc.step()
 
             generator.zero_grad()
@@ -123,6 +124,8 @@ def main():
             optimizer_disc.step()
             if i % 10 == 0:
                 print(f"Batch [{i+1}/{len(dataloader)}] complete")
+                print(f"elapsed time: {time.time() - start_time}")
+        print(f"epoch#{epoch} execution time: {time.time() - epoch_start_time}")
     torch.save(generator.state_dict(), 'generator.pt')
     torch.save(discriminator.state_dict(), 'discriminator.pt')
 
