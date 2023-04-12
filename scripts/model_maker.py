@@ -124,8 +124,10 @@ def main():
             optimizer_disc.step()
             if i % 10 == 0:
                 print(f"Batch [{i+1}/{len(dataloader)}] complete")
-                print(f"elapsed time: {time.time() - start_time}")
-        print(f"epoch#{epoch} execution time: {time.time() - epoch_start_time}")
+                elapsed_time = time.time() - start_time
+                print(f"elapsed time: {int(elapsed_time//3600)}h {(elapsed_time%3600)//60}m {elapsed_time%60:.2f}s")
+        epoch_execution_time = time.time() - epoch_start_time
+        print(f"epoch#{epoch} execution time: {int(epoch_execution_time//3600)}h {(epoch_execution_time%3600)//60}m {epoch_execution_time%60:.2f}s")
     torch.save(generator.state_dict(), 'generator.pt')
     torch.save(discriminator.state_dict(), 'discriminator.pt')
 
